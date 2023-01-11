@@ -1,12 +1,17 @@
 version: '3'
 
 services:
-  
   rabbitmq:
     image: 'rabbitmq:3.6-management-alpine'
     ports:
       - '5672:5672'
       - '15672:15672'
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=sigemar
+      - RABBITMQ_DEFAULT_PASS=sigemarqueue
+    volumes:
+      - ./server/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
 
   workers:
     build: workers
@@ -14,6 +19,8 @@ services:
       - ./workers:/app
     environment:
       - PYTHONUNBUFFERED=1
+    env_file:
+      - ./workers/.env
 
   server:
     build: server
@@ -21,3 +28,5 @@ services:
       - ./server:/app
     ports:
       - 5000:5000
+    env_file:
+      - ./workers/.env

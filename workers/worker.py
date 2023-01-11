@@ -1,10 +1,19 @@
 import pika
+from decouple import config
 
 
 class Worker:
+    user = config('rabbitmq_user')
+    password = config('rabbitmq_pass')
+
     def __init__(self, queue_name, handler):
+        print('Starting connection ...\n')
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host='rabbitmq'))
+            pika.ConnectionParameters(
+                host='rabbitmq',
+                credentials=pika.PlainCredentials(
+                    self.user, self.password))
+        )
         channel = connection.channel()
 
         channel.queue_declare(queue=queue_name, durable=True)

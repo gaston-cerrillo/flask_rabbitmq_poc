@@ -1,0 +1,5 @@
+pandas
+psycopg2
+sqlalchemy
+openpyxl
+python-decouple==3.6

@@ -1,7 +1,11 @@
 from flask import Flask, request
+from decouple import config
 import pika
 
 app = Flask(__name__)
+
+user = config('rabbitmq_user')
+password = config('rabbitmq_pass')
 
 
 @app.route('/')
@@ -12,7 +16,10 @@ def index():
 @app.route('/publish/<queue_name>', methods=['POST'])
 def add(queue_name):
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='rabbitmq', heartbeat=600))
+        pika.ConnectionParameters(host='rabbitmq',
+                                  credentials=pika.PlainCredentials(
+                                      user, password),
+                                  heartbeat=600))
     channel = connection.channel()
 
     channel.basic_publish(
